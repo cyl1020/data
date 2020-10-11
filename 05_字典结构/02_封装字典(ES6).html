@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>封装字典(ES6)</title>
+</head>
+
+<body>
+  <script>
+    //封装字典类
+    class Dictionay {
+      //属性
+      constructor() {
+        this.items = {}
+      }
+
+      //方法
+      //判断字典里是否有某个元素
+      has(key) {
+        return this.items.hasOwnProperty(key)
+      }
+
+      //添加元素
+      set(key, value) {
+        this.items[key] = value
+      }
+
+      //从字典里删除某个元素
+      remove(key) {
+        //1.判断字典里是否有该元素
+        if (!this.has(key)) return false
+
+        //2.从字典里删除该元素
+        delete this.items[key]
+        return true
+      }
+
+      //从字典里获取某个值
+      get(key) {
+        //1.判断字典里是否有该元素
+        if (!this.has(key)) return null
+
+        //2.从字典里获取该元素
+        return this.items[key]
+      }
+
+      //清空字典
+      clear() {
+        this.items = {}
+      }
+
+      //获取字典有多少个元素
+      size() {
+        return Object.keys(this.items).length
+      }
+
+      //获取字典的所有键
+      keys() {
+        return Object.keys(this.items)
+      }
+
+      //获取字典的所有值
+      values() {
+        return Object.values(this.items)
+      }
+    }
+
+    //测试字典类
+    let dict = new Dictionay()
+    dict.set('name', 'zhangsan')
+    dict.set('age', 18)
+    dict.set('sex', '男')
+    console.log(dict.items);
+
+    dict.remove('sex')
+    console.log(dict.items);
+    console.log(dict.get('name1'));
+    console.log(dict.size());
+    console.log(dict.keys());
+    console.log(dict.values());
+    dict.clear()
+    console.log(dict.items);
+  </script>
+</body>
+
+</html>

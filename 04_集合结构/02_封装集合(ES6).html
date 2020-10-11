@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>封装集合(ES6)</title>
+</head>
+
+<body>
+  <script>
+    //集合的特点：结集合里面没有重复的元素
+    //封装集合类
+    class Set {
+      //属性
+      constructor() {
+        this.items = {}
+      }
+
+      //方法
+      //添加元素
+      add(value) {
+        //1.判断集合里面是否已经有该元素，如果有就返回false，没有就添加
+        if (this.has(value)) return false
+
+        //2.将新的元素添加进集合
+        this.items[value] = value
+        return true
+      }
+
+      //判断集合里面是否有某个元素
+      has(value) {
+        return this.items.hasOwnProperty(value)
+      }
+
+      //删除集合中的某个元素
+      remove(value) {
+        //1.判断集合中是否有这个元素
+        if (!this.has(value)) return false
+
+        //2.删除该元素
+        delete this.items[value]
+        return true
+      }
+
+      //清空集合
+      clear() {
+        this.items = {}
+      }
+
+      //获取集合中元素的个数
+      size() {
+        return Object.keys(this.items).length
+      }
+
+      //获取集合中所有的值
+      values() {
+        return Object.keys(this.items)
+      }
+
+      //集合间的操作
+      /* 
+        this:当前集合(A)
+        otherSet:其他集合(B)
+      */
+      //并集
+      union(otherSet) {
+        //1.创建一个新的集合
+        // const set = new Set()
+
+        //2.取出A集合中的所有值添加进新集合中
+        // let valueA = this.values()
+        // valueA.forEach(item => set.add(item))
+
+        // 3.取出B集合中的所有值添加进新集合中
+        // let valueB = otherSet.values()
+        // valueB.forEach(item => set.add(item))
+
+        //4.返回最终的结果
+        // return set
+
+        return {...this.items, ...otherSet.items}
+      }
+
+      //交集
+      intersection(otherSet) {
+        //1.创建一个新的集合
+        const set = new Set()
+
+        //2.取出A集合中一个一个的值，并判断该值是同时存在于B集合中，存在就添加进新集合
+        let valueA = this.values()
+        valueA.forEach(item => {
+          if (otherSet.has(item)) {
+            set.add(item)
+          }
+        })
+
+        //3.返回最终的结果
+        return set
+      }
+
+      //差集
+      difference(otherSet) {
+        //1.创建一个新的集合
+        const set = new Set()
+
+        //2.取出A集合中一个一个的值，并判断该值是否不存在于B集合中，不存在就添加进新集合
+        let valueA = this.values()
+        valueA.forEach(item => {
+          if (!otherSet.has(item)) {
+            set.add(item)
+          }
+        })
+
+        //3.返回最终的结果
+        return set
+      }
+
+      //子集
+      subset(otherSet) {
+        //1.判断A集合的长度是否大于B集合的长度
+        if (this.size() > otherSet.size()) return false
+
+        //2.A集合中的元素只要有一个不存在于B级集合中，那么A集合就不是B集合的子集
+        let valueA = this.values()
+        valueA.forEach(item => {
+          if (!otherSet.has(item)) {
+            return false
+          }
+        })
+
+        //3.满足条件就返回true
+        return true
+      }
+    }
+
+    //测试
+    let set = new Set()
+
+    set.add('cyl')
+    set.add('cyl')
+    set.add('1')
+    set.add('2')
+    console.log(set.items);
+    console.log(set.remove('1'));
+    console.log(set.size());
+    console.log(set.values());
+    console.log(set.items);
+    set.clear()
+    console.log(set.items);
+
+    let setA = new Set()
+    setA.add('a')
+    setA.add('b')
+    setA.add('c')
+    setA.add('d')
+    let setB = new Set()
+    setB.add('a')
+    setB.add('b')
+    setB.add('d')
+
+    let union = setA.union(setB)
+    console.log(union);
+
+    let intersection = setA.intersection(setB)
+    console.log(intersection);
+
+    let difference = setA.difference(setB)
+    console.log(difference);
+
+    console.log(setA.subset(setB));
+
+  </script>
+</body>
+
+</html>

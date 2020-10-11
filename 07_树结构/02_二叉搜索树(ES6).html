@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>二叉搜索树(ES6)</title>
+</head>
+
+<body>
+  <script>
+    /* 
+      该树仅有key,没有value,如果有需要可以在节点类里直接加上value
+    */
+    //封装二叉搜索树
+    class BinarySearchTree {
+      //属性
+      constructor() {
+        this.root = null //二叉搜索树的根
+      }
+
+      //方法
+      //添加数据(采用循环的方式)
+      insert(key) {
+        //1.根据传入的数据创建一个新的节点
+        let newNode = new Node(key)
+
+        //2.判断根节点是否是null
+        if (this.root === null) { //2.1. 如果根为null，那么直接将根指向newNode即可
+          this.root = newNode
+        } else { //2.2. 如果不是null，那么就寻找到合适位置
+          let current = this.root
+          while (current) { //current不为null时，向下寻找
+            if (newNode.key < current.key) { //向左寻找
+              if (current.left === null) {
+                current.left = newNode
+                return //这里一定要有结束条件
+              } else {
+                current = current.left
+              }
+            } else { //向右寻找
+              if (current.right === null) {
+                current.right = newNode
+                return //这里一定要有结束条件
+              } else {
+                current = current.right
+              }
+            }
+          }
+        }
+      }
+
+      //树的遍历
+      //先序遍历(递归)
+      preOrderTravesal(handle) {
+        this.preOrderTraversalNode(this.root, handle)
+      }
+
+      preOrderTraversalNode(node, handle) {
+        if (node !== null) {
+          // 1.打印当前经过的节点
+          handle(node.key)
+
+          // 2.遍历所有的左子树
+          this.preOrderTraversalNode(node.left, handle)
+
+          // 3.遍历所有的右子树
+          this.preOrderTraversalNode(node.right, handle)
+        }
+      }
+
+      //最大值&&最小值
+      min() {
+        //1.获取根节点
+        let node = this.root
+
+        //循环查找
+        while (node.left) {
+          node = node.left
+        }
+
+        return node.key
+      }
+
+      max() {
+        //1.获取根节点
+        let node = this.root
+
+        //循环查找
+        while (node.right) {
+          node = node.right
+        }
+
+        return node.key
+      }
+
+      //搜索指定的key值
+      search(key) {
+        //1.获取根节点
+        let node = this.root
+
+        //2.循环查找
+        while (node) {
+          if (node.key > key) { //向左查找
+            node = node.left
+          } else if (node.key < key) { //向右查找
+            node = node.right
+          } else { //找到了，返回true
+            return true
+          }
+        }
+
+        //3.到这个地方，说明没有找到
+        return false
+      }
+
+      //删除节点
+      remove(key) {
+        //1.寻找要删除的节点
+        //1.1. 定义变量，保存临时信息
+        let current = this.root
+        let parent = null
+        let isLeftChild = true
+
+        //1.2. 开始寻找
+        while (current.key !== key) {
+          parent = current
+          if (current.key > key) { //向左查找
+            isLeftChild = true
+            current = current.left
+          } else { //向右查找
+            isLeftChild = false
+            current = current.right
+          }
+
+          //找到最后都没有找到
+          if (current === null) return false
+        }
+
+        //2.开始删除节点
+        //2.1. 被删除的节点没有子节点
+        if (current.left === null && current.right === null) {
+          if (current === this.root) {
+            this.root = null
+          } else if (isLeftChild) {
+            parent.left = null
+          } else {
+            parent.right = null
+          }
+        }
+
+        //2.2. 被删除的节点有一个子节点
+        else if (current.right === null) {
+          if (current = this.root) {
+            this.root = current.left
+          } else if (isLeftChild) {
+            parent.left = current.left
+          } else {
+            parent.right = current.left
+          }
+        } else if (current.left === null) {
+          if (current = this.root) {
+            this.root = current.right
+          } else if (isLeftChild) {
+            parent.left = current.right
+          } else {
+            parent.right = current.right
+          }
+        }
+
+        //2.3. 被删除的节点有两个子节点
+        else {
+          //1.获取后继节点
+          let successor = this.getSuccessor(current)
+          if (current === this.root) {
+            this.root = successor
+          } else if (isLeftChild) {
+            parent.left = successor
+          } else {
+            parent.right = successor
+          }
+
+          successor.left = current.left
+        }
+      }
+
+      //寻找后继节点
+      getSuccessor(delNode) {
+        //1. 定义变量，保存找到的后继节点
+        let successor = delNode
+        let successorParent = null
+        let current = delNode.right
+
+        //2.循环查找
+        while (current !== null) {
+          successorParent = successor
+          successor = current
+          current = current.left
+        }
+
+        //3.判断找到的后继节点是否是被删除节点的右节点
+        if (successor !== delNode.right) {
+          successorParent.left = successor.right
+          successor.right = delNode.right
+        }
+
+        return successor
+      }
+    }
+
+    //节点类
+    class Node {
+      constructor(key) {
+        this.key = key //该节点的数据
+        this.left = null //该节点的左孩子
+        this.right = null //该节点的右孩子
+      }
+    }
+
+
+
+    //测试
+    let bst = new BinarySearchTree()
+    bst.insert(11)
+    bst.insert(7)
+    bst.insert(15)
+    bst.insert(5)
+    bst.insert(3)
+    bst.insert(9)
+    bst.insert(8)
+    bst.insert(10)
+    bst.insert(13)
+    bst.insert(12)
+    bst.insert(14)
+    bst.insert(20)
+    bst.insert(18)
+    bst.insert(25)
+    // bst.insert(6)
+    // bst.insert(3)
+    // bst.insert(7)
+    // bst.insert(2)
+    // bst.insert(5)
+    console.log(bst);
+
+    let resultString1 = ""
+    bst.preOrderTravesal(key => resultString1 += key + " ")
+    console.log('先序', resultString1)
+
+    console.log(bst.min());
+    console.log(bst.max());
+
+    console.log(bst.search(24));
+    console.log(bst.search(25));
+
+    bst.remove(3)
+    bst.remove(7)
+    bst.remove(15)
+
+    let resultString = ""
+    bst.preOrderTravesal(key => resultString += key + " ")
+    console.log('先序', resultString)
+  </script>
+</body>
+
+</html>

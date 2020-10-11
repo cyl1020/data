@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>单向链表(ES6)</title>
+</head>
+
+<body>
+  <script>
+    /* 
+      关于position越界的问题:
+        1.position不能为负数
+        2.添加元素的时候position可以取到length值，其他情况都不能取到length值
+    */
+    //封装单项链表
+    class LinkedList {
+      //属性
+      constructor() {
+        this.head = null //单向链表的头
+        this.length = 0 //记录单向链表中元素的个数
+      }
+
+      //方法
+      //尾部追加数据
+      append(data) {
+        //1.根据数据创一个新的节点
+        const newNode = new Node(data)
+
+        //2.判断单项链表是否为空
+        if (this.length === 0) { //2.1. 为空的情况，直接将head指向新的节点
+          this.head = newNode
+        } else { //2.2. 不为空，就找到最后一个元素，将最后一个元素的next指向新的节点
+          let current = this.head
+          while (current.next) {
+            current = current.next
+          }
+          current.next = newNode
+        }
+
+        //3.单项链表的长度加一
+        this.length += 1
+      }
+
+      //toString 
+      toString() {
+        let current = this.head
+        let str = ''
+        while (current) {
+          str += current.data + ' -> '
+          current = current.next
+        }
+        return str.slice(0, str.length - 4)
+      }
+
+      //任意位置插入
+      insert(data, position) {
+        //1.判断是否越界
+        if (position < 0 || position > this.length) return false
+
+        //2.根据数据创建一个新的节点
+        const newNode = new Node(data)
+
+        //3.定义变量，保存临时的信息
+        let current = this.head
+        let previous = null
+        let index = 0
+
+        //4.判断是否是在第一个位置插入（position === 0）
+        if (position === 0) {
+          newNode.next = this.head
+          this.head = newNode
+        } else { //根据position找到正确的位置并插入新节点
+          while (index++ < position) {
+            previous = current
+            current = current.next
+          }
+          previous.next = newNode
+          newNode.next = current
+        }
+
+        //5.单项链表的长度加一
+        this.length += 1
+        return true
+      }
+
+      //获取元素位置
+      indexOf(data) {
+        //1.定义变量，保存临时的信息
+        let current = this.head
+        let index = 0
+
+        //2.找到元素所在的位置
+        while (current) {
+          if (current.data === data) {
+            return index
+          }
+          current = current.next
+          index++
+        }
+
+        //3.到这个位置还没有找到就返回-1
+        return -1
+      }
+
+      //获取对应位置的元素
+      get(position) {
+        //1.判断是否越界
+        if (position < 0 || position >= this.length) return false
+
+        //2.定义变量，保存临时的信息
+        let current = this.head
+        let index = 0
+
+        //3.循环找到对应位置的元素
+        while (index++ < position) {
+          current = current.next
+        }
+        return current.data
+      }
+
+      //根据位置更元素
+      update(position, data) {
+        //1.判断是否越界
+        if (position < 0 || position >= this.length) return false
+
+        //2.定义变量，保存临时的信息
+        let current = this.head
+        let index = 0
+
+        //3.循环找到对应位置的元素
+        while (index++ < position) {
+          current = current.next
+        }
+        current.data = data
+        return true
+      }
+
+      //根据位置删除元素
+      removeAt(position) {
+        //1.判断是否越界
+        if (position < 0 || position >= this.length) return false
+
+        //2.定义变量，保存临时的信息
+        let current = this.head
+        let previous = null
+        let index = 0
+
+        //3.判断删除的位置
+        if (position === 0) {
+          this.head = current.next
+        } else {
+          while (index++ < position) {
+            previous = current
+            current = current.next
+          }
+
+          //前一个节点的next指向current的next即可
+          previous.next = current.next
+        }
+
+        //4.单项链表的长度减一
+        this.length -= 1
+
+        //5.返回被删除的元素
+        return current.data
+      }
+
+      //根据元素删除
+      remove(data) {
+        //1.根据data获取index
+        let index = this.indexOf(data)
+
+        //2.删除对应的元素并返回
+        return this.removeAt(index)
+      }
+
+      //查看单向链表是否为空
+      isEmpty() {
+        return this.length === 0
+      }
+
+      //获取单向链表的元素个数
+      size() {
+        return this.length
+      }
+    }
+
+    //节点类
+    class Node {
+      constructor(data) {
+        this.data = data
+        this.next = null
+      }
+    }
+
+    //测试
+    let list = new LinkedList()
+    list.append('a')
+    list.append('b')
+    list.append('c')
+    list.append('d')
+    list.append('cyl')
+    list.insert('cyl', 0)
+    list.insert('cyl', 2)
+    console.log(list.toString());
+    console.log('a的位置', list.indexOf('a'));
+    console.log('0位置的元素是', list.get(6));
+    console.log(list.removeAt(5));
+    console.log(list.toString());
+    console.log(list.update(4, 'cba'));
+    console.log(list.toString());
+    console.log(list.remove('cba'));
+    console.log(list.toString());
+    console.log(list.size());
+    console.log(list.isEmpty());
+  </script>
+</body>
+
+</html>

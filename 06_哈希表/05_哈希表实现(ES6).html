@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>哈希表实现(ES6)</title>
+</head>
+
+<body>
+  <script>
+    //封装哈希表(用空间换时间)
+    //采用链地址法
+    class HashTable {
+      //属性
+      constructor() {
+        this.storage = [] //用于存储数据的数组
+        this.count = 0 //记录哈希表中有多少个数据
+        this.limit = 7 //哈希表的长度
+      }
+
+      //方法
+
+      //判断一个数是不是质数
+      isPrime(num) {
+        //1.获取num的平方根
+        let temp = parseInt(Math.sqrt(num))
+
+        //2.循环判断
+        for (let i = 2; i <= temp; i++) { //这里的i一定要从2开始
+          if (num % i === 0) return false
+        }
+
+        return true
+      }
+
+      //寻找质数
+      getPrime(num) {
+        while (!this.isPrime(num)) {
+          num++
+        }
+        return num
+      }
+
+      //哈希函数
+      HashFunc(str, max) {
+        //1.初始化哈希值
+        let hashCode = 0
+
+        //2.使用霍纳算法，来计算hashCode的值
+        /* 
+          霍纳算法:(乘法最少，提高效率)
+            A(x) = (...(((a[n]*x + a[n-1])*x + a[n-2])*x + a[n-3])*x+...+ a[1])*x + a[0]
+        */
+        for (let i = 0; i < str.length; i++) {
+          hashCode = 37 * hashCode + str.charCodeAt(i)
+        }
+
+        //3.对hashCode取余并返回(压缩)
+        return hashCode % max
+      }
+
+      //添加&&修改数据
+      put(key, value) {
+        //1.根据数据获取对应的哈希值
+        let index = this.HashFunc(key, this.limit)
+
+        //2.根据index获取对应的bucket
+        let bucket = this.storage[index]
+
+        //3.如果bucket不存在，就将它赋值为一个数组,并放入哈希表中对应的位置
+        if (bucket === undefined) {
+          bucket = []
+          this.storage[index] = bucket
+        }
+
+        //4.判断是否是修改数据
+        bucket.forEach(tuple => {
+          if (tuple[0] === key) {
+            tuple[1] = value
+            return
+          }
+        })
+
+        //5.添加数据，哈希表数据的长度加一
+        bucket.push([key, value])
+        this.count += 1
+
+        //6.判断是否需要扩容
+        if (this.count > this.limit * 0.75) {
+          this.resize(this.getPrime(this.limit * 2))
+        }
+      }
+
+      //获取数据
+      get(key) {
+        //1.根据数据获取对应的哈希值
+        let index = this.HashFunc(key, this.limit)
+
+        //2.根据index获取对应的bucket
+        let bucket = this.storage[index]
+
+        //3.如果bucket不存在，就将返回false
+        if (bucket === undefined) return false
+
+        //4.修改对应的数据
+        for (let i = 0; i < bucket.length; i++) {
+          let tuple = bucket[i]
+          if (tuple[0] === key) {
+            return tuple[1]
+          }
+        }
+
+        //5.如果依然没有找到就返回null
+        return null
+      }
+
+      //删除数据
+      remove(key) {
+        //1.根据数据获取对应的哈希值
+        let index = this.HashFunc(key, this.limit)
+
+        //2.根据index获取对应的bucket
+        let bucket = this.storage[index]
+
+        //3.如果bucket不存在，就将返回false
+        if (bucket === undefined) return false
+
+        //4.删除对应的数据
+        for (let i = 0; i < bucket.length; i++) {
+          let tuple = bucket[i]
+          if (tuple[0] === key) {
+            bucket.splice(i, 1)
+            this.count -= 1
+            return tuple[1]
+
+            //判断是否需要缩小容量
+            if (this.limit > 7 && this.count < this.limit * 0.25) {
+              this.resize(this.getPrime(Math.floor(this.limit / 2)))
+            }
+          }
+        }
+
+        //5.如果依然没有找到就返回null
+        return null
+      }
+
+      //扩容
+      resize(newLimit) {
+        //1.定义一个变量，接收storage
+        let oldStorage = this.storage
+
+        //2.清空原来所有的属性
+        this.storage = []
+        this.count = 0
+        this.limit = newLimit //这里是扩容的核心操作
+
+        //3.将以前的数据全部取出，并重新插入扩容之后的哈希表
+        oldStorage.forEach(bucket => {
+          //3.1. 如果当前次的bucket为空，就跳过本次执行下一次
+          if (bucket === undefined) return
+
+          //3.2. 如果有数据就重新插入
+          bucket.forEach(tuple => this.put(tuple[0], tuple[1]))
+        })
+      }
+    }
+
+    //测试
+    let ht = new HashTable()
+
+    ht.put('name', 'zhangsan')
+    ht.put('sex', '男')
+    ht.put('age', 18)
+    ht.put('1', 18)
+    ht.put('11', 18)
+    ht.put('111', 18)
+    ht.put('1l', 18)
+    ht.put('1k', 18)
+    console.log(ht);
+
+    console.log(ht.get('111'));
+
+    console.log(ht.remove('sex'));
+  </script>
+
+</body>
+
+</html>

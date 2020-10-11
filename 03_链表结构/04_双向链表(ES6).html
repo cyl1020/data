@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>双向链表(ES6)</title>
+</head>
+
+<body>
+  <script>
+    //封装双向链表类
+    class DoublyLinkedList {
+      //属性
+      constructor() {
+        this.head = null //双向链表的头部
+        this.tail = null //双向链表的尾部
+        this.length = 0
+      }
+
+      //方法
+      //向尾部增加元素
+      append(data) {
+        //1.先根据数据创建一个新的节点
+        const newNode = new Node(data)
+
+        //2.判断双向链表是否为空
+        if (this.length === 0) { //2.1. 如果为空，将头指针和尾指针都指向新节点即可
+          this.head = newNode
+          this.tail = newNode
+        } else { //2.2. 如果不为空，将尾指针指向新节点
+          newNode.prev = this.tail
+          this.tail.next = newNode
+          this.tail = newNode
+        }
+
+        //3.双向链表的长度加一
+        this.length += 1
+      }
+
+      //遍历的方法
+      //toString
+      toString() {
+        return this.forwordString()
+      }
+
+      //正向遍历
+      forwordString() {
+        //1.定义变量，保存临时信息
+        let current = this.head
+        let str = ''
+
+        //2.循环查找每一个元素
+        while (current) {
+          str += current.data + ' <==> '
+          current = current.next
+        }
+
+        //3.返回最终的结果
+        return str.slice(0, str.length - 6)
+      }
+
+      //反向遍历
+      backwordString() {
+        //1.定义变量，保存临时信息
+        let current = this.tail
+        let str = ''
+
+        //2.循环查找每一个元素
+        while (current) {
+          str += current.data + ' <==> '
+          current = current.prev
+        }
+
+        //3.返回最终的结果
+        return str.slice(0, str.length - 6)
+      }
+
+      //在任意位置插入元素
+      insert(position, data) {
+        //1.判断越界问题
+        if (position < 0 || position > this.length) return false
+
+        //2.根据数据创建一个新的节点
+        const newNode = new Node(data)
+
+        //3.在对应的位置插入元素
+        if (position === 0) { //3.1. 在链表的头部插入
+          if (this.length === 0) { //3.1.1. 判断链表是否为空
+            this.head = newNode
+            this.tail = newNode
+          } else {
+            this.head.prev = newNode
+            newNode.next = this.head
+            this.head = newNode
+          }
+        } else if (position === this.length) { //3.2. 在链表的尾部插入
+          newNode.prev = this.tail
+          this.tail.next = newNode
+          this.tail = newNode
+        } else { //3.3. 在链表的中间位置插入
+          //3.3.1 定义变量，保存临时信息
+          let current = this.head
+          let previous = null
+          let index = 0
+          while (index++ < position) {
+            previous = current
+            current = current.next
+          }
+          previous.next = newNode
+          newNode.prev = previous
+          newNode.next = current
+          current.prev = newNode
+        }
+
+        //4.双向链表的长度加一
+        this.length += 1
+        return true
+      }
+
+      //根据元素位置获取元素
+      //1.普通版
+      get(position) {
+        //1.判断是否越界
+        if (position < 0 || position >= this.length) return null
+
+        //2.定义变量，保存临时信息
+        let current = this.head
+        let index = 0
+
+        //3.循环找到正确的位置
+        while (index++ < position) {
+          current = current.next
+        }
+
+        return current.data
+      }
+
+      //2.增强版(二分查找)
+      getPlus(position) {
+        //1.判断是否越界
+        if (position < 0 || position >= this.length) return null
+
+        //2.判断position是否大于length/2
+        if (position < parseInt(this.length / 2)) { //小于就正向查找
+          return this.get(position)
+        } else { //大于就反向查找
+          //定义变量，保存临时信息
+          let current = this.tail
+          let index = this.length - 1
+          while (index-- > position) {
+            current = current.prev
+          }
+          return current.data
+        }
+      }
+
+      //获取元素的位置
+      indexOf(data) {
+        //1.定义变量，保存临时信息
+        let current = this.head
+        let index = 0
+
+        //2.循环找到元素
+        while (current) {
+          if (current.data === data) {
+            return index
+          }
+          index++
+          current = current.next
+        }
+
+        //3.找到这里还没有找到，就返回-1
+        return -1
+      }
+
+      //更新指定位置的元素
+      update(position, data) {
+        //1.判断是否越界
+        if (position < 0 || position >= this.length) return false
+
+        //2.定义变量，保存临时信息
+        let current = this.head
+        let index = 0
+
+        //3.循环找到正确的位置
+        while (index++ < position) {
+          current = current.next
+        }
+
+        current.data = data
+        return true
+      }
+
+      //删除指定位置的元素
+      removeAt(position) {
+        //1.判断是否越界
+        if (position < 0 || position >= this.length) return false
+
+        //2.定义变量，保存临时信息
+        let current = this.head
+        let previous = null
+        let index = 0
+
+        //3.判断删除的位置
+        if (position === 0) { //删除第一个位置的元素
+          if (this.length === 1) { //链表中只有一个元素
+            this.head = null
+            this.tail = null
+          } else {
+            this.head = this.head.next
+            this.head.prev = null
+          }
+        } else if (position === this.length - 1) { //删除最后一个位置的元素
+          current = this.tail //保留删除的元素
+          this.tail = this.tail.prev
+          this.tail.next = null
+        } else { //删除链表中间的元素
+          while (index++ < position) { //循环找到正确的位置
+            previous = current
+            current = current.next
+          }
+          previous.next = current.next
+          current.next.pre = previous
+        }
+
+        //4.链表的长度减一
+        this.length -= 1
+
+        //5.返回被删除的元素
+        return current.data
+      }
+
+      //根据元素删除
+      remove(data) {
+        //1.获取元素在链表中的位置
+        let index = this.indexOf(data)
+
+        //2.返回删除的元素
+        return this.removeAt(index)
+      }
+
+      //判断是否为空
+      isEmtpy() {
+        return this.length === 0
+      }
+
+      //查看链表中元素的个数
+      size() {
+        return this.length
+      }
+
+      //查看链表的第一个元素
+      Head() {
+        return this.head.data
+      }
+
+      //查看链表的最后一个元素
+      Tail() {
+        return this.tail.data
+      }
+    }
+
+    //节点类
+    class Node {
+      constructor(data) {
+        this.data = data //当前节点存储的数据
+        this.prev = null //指向前一个节点的指针
+        this.next = null //指向后一个节点的指针
+      }
+    }
+
+    //测试
+    let list = new DoublyLinkedList()
+    list.append('a')
+    list.append('b')
+    list.append('c')
+    list.append('d')
+    list.append('e')
+    console.log('toString ', list.toString());
+    console.log('正向遍历  ', list.forwordString());
+    console.log('反向遍历  ', list.backwordString());
+    list.insert(0, 'abc')
+    list.insert(6, 'cyl')
+    console.log('toString ', list.toString());
+    console.log(list.get(3));
+    console.log(list.getPlus(3));
+    console.log(list.indexOf('e'));
+    list.update(0, 'cyllyc')
+    console.log('toString ', list.toString());
+    console.log(list.removeAt(2));
+    console.log('toString ', list.toString());
+    console.log(list.remove('a'));
+    console.log('toString ', list.toString());
+    console.log('toString ', list.toString());
+    console.log(list.isEmtpy());
+    console.log(list.size());
+    console.log(list.Head());
+    console.log(list.Tail());
+  </script>
+</body>
+
+</html>

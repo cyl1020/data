@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>优先级队列(ES6)</title>
+</head>
+
+<body>
+  <script>
+    //封装优先级队列
+    class PriorityQueue {
+      //属性
+      constructor() {
+        this.items = []
+      }
+
+      //方法
+      //插入方法
+      insert(data, priority) {
+        //1.根据传入的数据创建一个新的节点
+        const newNode = new Node(data, priority)
+
+        //2.判断优先级队列是否为空
+        if (this.items.length === 0) { //2.1. 如果为空就直接插入
+          this.items.push(newNode)
+        } else { //2.2. 不为空就比较优先级之后在对应的位置插入
+
+          let flag = false // 设置一个标识符，用于判断newNode有没有插入进队列
+          this.items.forEach((item, i) => {
+            if (this.items[i].priority > newNode.priority) {
+              this.items.splice(i, 0, newNode)
+              flag = true
+            }
+          })
+
+          //2.3. 如果到这里都还没有插入，就在队列的队尾插入
+          if (!flag) {
+            this.items.push(newNode)
+          }
+        }
+      }
+    }
+
+    //节点类
+    class Node {
+      constructor(data, priority) {
+        this.priority = priority
+        this.data = data
+      }
+    }
+
+    //测试
+    const pq = new PriorityQueue()
+    pq.insert('a', 1)
+    pq.insert('b', 11)
+    pq.insert('c', 1111)
+    pq.insert('d', 111)
+    console.log(pq);
+    pq.items.forEach( item => {
+      console.log(item.data, item.priority);
+    })
+  </script>
+</body>
+
+</html>

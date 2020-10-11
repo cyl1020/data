@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>栈的封装(ES6)</title>
+</head>
+
+<body>
+  <script>
+    //封装栈结构
+    class Stack {
+      //属性
+      constructor() {
+        this.items = []
+      }
+
+      //方法
+      //将元素压入栈中
+      push(data) {
+        this.items.push(data)
+      }
+
+      //从栈中取出栈顶元素
+      pop() {
+        return this.items.pop()
+      }
+      
+      //查看栈顶元素
+      peak() {
+        return this.items[this.items.length - 1]
+      }
+
+      //查看栈是否为空
+      isEmpty() {
+        return this.items.length === 0
+      }
+
+      //获取栈中元素的个数
+      size() {
+        return this.items.length
+      }
+
+      //toString
+      toString() {
+        return this.items.join(' - ')
+      }
+    }
+
+    //测试
+    const stack = new Stack()
+    stack.push('a')
+    stack.push('b')
+    stack.push('c')
+    stack.push('d')
+    stack.push('e')
+    console.log(stack);
+    console.log(stack.pop());
+    console.log(stack.peak());
+    console.log(stack.isEmpty());
+    console.log(stack.size());
+    console.log(stack.toString());
+
+    //应用:十进制转换为其他进制
+    function dec2any(decNumber, num = 2) {
+      let arr = [2, 8, 16]
+      if (!arr.includes(num)) {
+        alert('请输入正确的进制(2, 8, 16),默认转为二进制')
+        return false
+      } 
+      //1.创建一个新的栈结构
+      let stack = new Stack()
+
+      //2.当decNumber不为空时，循环
+      while (decNumber > 0) {
+        //2.1. 将余数压入栈中
+        stack.push(decNumber % num)
+
+        //2.2. 将decNumber/num的结果作为下一次运行的数字
+        decNumber = Math.floor(decNumber / num)
+      }
+
+      //3.从栈中取出数字
+      let resultStr = ''
+      while (!stack.isEmpty()) {
+        resultStr += stack.pop()
+      }
+      return resultStr
+    }
+
+    console.log(dec2any(1000, 2));
+  </script>
+</body>
+
+</html>
